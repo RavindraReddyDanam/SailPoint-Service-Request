@@ -38,3 +38,38 @@
 		}
 	}
 })(current, template, email, email_action, event);
+
+Script Include:
+GetLocationName:function(Name){
+		var fetchLocation=new GlideRecord('cmn_location');
+		fetchLocation.addQuery('sys_id',Name);
+		fetchLocation.query();
+		while(fetchLocation.next()){
+			return fetchLocation.name;
+		}
+	}
+	translationList:function(dBValue){
+	if(dBValue=='new_access'){
+		return 'New Access for New Employee';
+	}
+	else if(dBValue=='title_location_change'){
+		return 'Update Access for existing employee after profile update';
+	}
+	else if(dBValue=='new_contractor'){
+		return 'New Contractor Creation' ;
+	}
+	else if(dBValue=='profile_update'){
+		return 'Profile Update for Contractor';
+	}
+	else if(dBValue=='smwe_employee'){
+		return 'SMWE Employee';
+	}
+	else if(dBValue=='contractor'){
+		return 'Contractor';
+	}
+	else{
+		return dBValue;
+	}
+
+}
+	
