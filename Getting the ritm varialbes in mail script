@@ -1,0 +1,40 @@
+(function runMailScript(current, template, email, email_action, event) {
+	template.print(gs.getMessage("Summary of Requested items") + "<br/>");
+	var itemList = new GlideRecord("sc_req_item");
+	itemList.addQuery("request", current.sysapproval);
+	itemList.query();
+	while(itemList.next()){
+		template.print('    '+ itemList.number +"-"+itemList.cat_item.name+"<br/>");
+	}
+	var item = new GlideRecord("sc_req_item");
+	item.addQuery("request", current.sysapproval);
+	item.setLimit(1);
+	item.query();
+	while(item.next()) {
+		var varOwnerShip=new GlideRecord('sc_item_option_mtom');
+		varOwnerShip.addQuery('request_item',item.sys_id);
+		varOwnerShip.query();
+		while(varOwnerShip.next()){
+			var optionsCheck=new GlideRecord('sc_item_option');
+			optionsCheck.addQuery('sys_id',varOwnerShip.sc_item_option);			optionsCheck.addEncodedQuery('item_option_new.nameINrequirement_for,request_type,contractor_request_type,start_date_new,name_of_the_employee_contractor,name_of_the_contractor');
+			optionsCheck.query();
+			optionsCheck.orderByDesc('sys_created_on');
+			while(optionsCheck.next()){
+				
+				if((optionsCheck.item_option_new.name=='start_date_new'&& !optionsCheck.value.nil())){
+					template.print('     ' +optionsCheck.item_option_new.question_text + " = " +optionsCheck.value+ "<br/>");
+				}
+				if((optionsCheck.item_option_new.name=='requirement_for')||(optionsCheck.item_option_new.name=='request_type' && !optionsCheck.value.nil()) || (optionsCheck.item_option_new.name=='contractor_request_type' && !optionsCheck.value.nil())){
+					template.print('     ' +optionsCheck.item_option_new.question_text + " = " +new global.SailPointDateManagement().translationList(optionsCheck.value)+ "<br/>");
+				}
+				if(optionsCheck.item_option_new.name=='name_of_the_employee_contractor' && !optionsCheck.value.nil()){
+					template.print('     ' +optionsCheck.item_option_new.question_text + " = " +new global.SailPointDateManagement().GetEmployeeName(optionsCheck.value) + "<br/>");
+				}
+				if(optionsCheck.item_option_new.name=='name_of_the_contractor' && !optionsCheck.value.nil()){
+					template.print('     ' +optionsCheck.item_option_new.question_text + " = " +optionsCheck.value+ "<br/>");
+				}
+				
+			}
+		}
+	}
+})(current, template, email, email_action, event);
